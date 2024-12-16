@@ -1,24 +1,44 @@
 import { Injectable } from "@nestjs/common";
+import { Lesson } from "src/entities/lesson.entity";
+import { EntityManager } from "typeorm";
 
 @Injectable()
 export class LessonService {
-  readCountByChapterId(chapterId: number) {
-    throw new Error("TODO");
+  constructor(private readonly entityManager: EntityManager) {}
+
+  async readCountByChapterId(chapterId: number) {
+    const count = await this.entityManager.count(Lesson, {
+      where: {
+        chapter: { id: chapterId },
+      },
+    });
+
+    return { count };
   }
 
   readAllByStudentId(studentId: number) {
-    throw new Error("TODO");
+    return this.entityManager.find(Lesson, {
+      where: { students: { id: studentId } },
+    });
   }
 
   delete(id: number) {
-    throw new Error("TODO");
+    return this.entityManager.delete(Lesson, { id });
   }
 
-  updateAddStudentToLesson(studentId: number, lessonId: number) {
-    throw new Error("TODO");
+  async updateAddStudentToLesson(studentId: number, lessonId: number) {
+    await this.entityManager
+      .createQueryBuilder()
+      .relation(Lesson, "students")
+      .of({ id: lessonId })
+      .add({ id: studentId });
   }
 
-  updateRemoveStudentFromLesson(studentId: number, lessonId: number) {
-    throw new Error("TODO");
+  async updateRemoveStudentFromLesson(studentId: number, lessonId: number) {
+    await this.entityManager
+      .createQueryBuilder()
+      .relation(Lesson, "students")
+      .of({ id: lessonId })
+      .remove({ id: studentId });
   }
 }

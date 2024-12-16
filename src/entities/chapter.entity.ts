@@ -12,6 +12,6 @@ export class Chapter {
   @Column()
   description: string;
 
-  @OneToMany(() => Lesson, (lesson) => lesson.chapter)
+  @OneToMany(() => Lesson, (lesson) => lesson.chapter, { cascade: true })
   lessons: Lesson[];
 }

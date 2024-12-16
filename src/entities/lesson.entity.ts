@@ -20,7 +20,9 @@ export class Lesson {
   @Column()
   description: string;
 
-  @ManyToOne(() => Chapter, (chapter) => chapter.lessons)
+  @ManyToOne(() => Chapter, (chapter) => chapter.lessons, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "chapter_id" })
   chapter: Chapter;
 

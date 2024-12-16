@@ -1,25 +1,41 @@
 import { Injectable } from "@nestjs/common";
-import { NewStudentDto } from "./student.dto";
+import { DietaryPreference, NewStudentDto } from "./student.dto";
+import { EntityManager, Not } from "typeorm";
+import { Student } from "src/entities/student.entity";
 
 @Injectable()
 export class StudentService {
+  constructor(private readonly entityManager: EntityManager) {}
+
   readAll() {
-    throw new Error("TODO");
+    return this.entityManager.find(Student);
   }
 
   readAllNonOmnivores() {
-    throw new Error("TODO");
+    return this.entityManager.find(Student, {
+      where: {
+        dietaryPreference: Not(DietaryPreference.OMNIVORE),
+      },
+    });
   }
 
   readOneById(id: number) {
-    throw new Error("TODO");
+    return this.entityManager.findOne(Student, { where: { id } });
   }
 
-  create(student: NewStudentDto) {
-    throw new Error("TODO");
+  async create(student: NewStudentDto) {
+    const result = await this.entityManager.save(Student, {
+      firstName: student.firstName,
+      lastName: student.lastName,
+      age: student.age,
+      dietaryPreference:
+        student.dietaryPreference ?? DietaryPreference.OMNIVORE,
+    });
+
+    return { id: result.id };
   }
 
-  delete(id: number) {
-    throw new Error("TODO");
+  async delete(id: number) {
+    await this.entityManager.delete(Student, { id });
   }
 }
